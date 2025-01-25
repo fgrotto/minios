@@ -1,4 +1,5 @@
 #include "kernel.h"
+#include "common.h"
 
 typedef unsigned char uint8_t;
 typedef unsigned int uint32_t;
@@ -26,6 +27,8 @@ struct sbiret sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4,
 }
 
 void putchar(char ch) {
+    // https://github.com/riscv-software-src/opensbi/blob/0ad866067d7853683d88c10ea9269ae6001bcf6f/lib/sbi/sbi_trap.c#L263
+    // https://github.com/riscv-software-src/opensbi/blob/0ad866067d7853683d88c10ea9269ae6001bcf6f/lib/sbi/sbi_ecall_legacy.c#L63C2-L65
     sbi_call(ch, 0, 0, 0, 0, 0, 0, 1 /* Console Putchar */);
 }
 
@@ -34,6 +37,9 @@ void kernel_main(void) {
     for (int i = 0; s[i] != '\0'; i++) {
         putchar(s[i]);
     }
+
+    printf("\n\nHello %s\n", "World!");
+    printf("1 + 2 = %d, %x\n", 1 + 2, 0x1234abcd);
 
     for (;;) {
         __asm__ __volatile__("wfi");
