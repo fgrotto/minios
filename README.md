@@ -7,7 +7,7 @@ Learning project to dive into RISC-V ISA and OS development.
 - Small OS for 32-bit RISC-V ISA (we will extend it for 64-bit)
 - QEMU support
 
-## How to run it
+## Setup:
 
 ```bash
 # To install the initial setup

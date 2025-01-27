@@ -46,13 +46,6 @@ void kernel_main(void) {
     }
 }
 
-void *memset(void *buf, char c, size_t n) {
-    uint8_t *p = (uint8_t *) buf;
-    while (n--)
-        *p++ = c;
-    return buf;
-}
-
 __attribute__((section(".text.boot")))
 __attribute__((naked))
 void boot(void) {
