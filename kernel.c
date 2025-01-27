@@ -26,6 +26,26 @@ struct sbiret sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4,
     return (struct sbiret){.error = a0, .value = a1};
 }
 
+extern char __free_ram[], __free_ram_end[];
+
+
+// It allocates in a larger unit called "pages". 1 page is typically 4KB (4096 bytes).
+// 4KB = 4096 = 0x1000 (hexadecimal). Thus, page-aligned addresses look nicely aligned in hexadecimal.
+// The following alloc_pages function dynamically allocates n pages of memory and returns the starting address:
+
+// This is the implementation of a linear allocato.
+paddr_t alloc_pages(uint32_t n) {
+    static paddr_t next_paddr = (paddr_t) __free_ram;
+    paddr_t paddr = next_paddr;
+    next_paddr += n * PAGE_SIZE;
+
+    if (next_paddr > (paddr_t) __free_ram_end)
+        PANIC("out of memory");
+
+    memset((void *) paddr, 0, n * PAGE_SIZE);
+    return paddr;
+}
+
 void putchar(char ch) {
     // https://github.com/riscv-software-src/opensbi/blob/0ad866067d7853683d88c10ea9269ae6001bcf6f/lib/sbi/sbi_trap.c#L263
     // https://github.com/riscv-software-src/opensbi/blob/0ad866067d7853683d88c10ea9269ae6001bcf6f/lib/sbi/sbi_ecall_legacy.c#L63C2-L65
@@ -131,6 +151,13 @@ void kernel_main(void) {
     } 
 
     // PANIC("boom");
+
+    paddr_t paddr0 = alloc_pages(2);
+    paddr_t paddr1 = alloc_pages(1);
+    printf("alloc_pages test: paddr0=%x\n", paddr0);
+    printf("alloc_pages test: paddr1=%x\n", paddr1);
+    // Use llvm-nm kernel.elf | grep __free_ram to verify the allocated addresses
+
     printf("\n\nHello %s\n", "World!");
     printf("1 + 2 = %d, %x\n", 1 + 2, 0x1234abcd);
 
